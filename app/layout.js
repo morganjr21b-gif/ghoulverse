@@ -16,6 +16,7 @@ export default function RootLayout({ children }) {
             <a href="/explore" style={nav.link}>Explore</a>
             <a href="/library" style={nav.link}>Library</a>
             <a href="/upload" style={nav.link}>Upload</a>
+            <a href="/studio" style={nav.link}>Studio</a>
             <a href="/profile" style={nav.link}>Profile</a>
             <a href="/settings" style={nav.link}>Settings</a>
             <a href="/login" style={nav.link}>Log In</a>
