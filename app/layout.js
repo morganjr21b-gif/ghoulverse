@@ -13,7 +13,11 @@ export default function RootLayout({ children }) {
             <span style={nav.logo}>GHOUL<span style={{ color: "#E63946" }}>VERSE</span></span>
           </a>
           <div style={nav.links}>
+            <a href="/explore" style={nav.link}>Explore</a>
+            <a href="/library" style={nav.link}>Library</a>
             <a href="/upload" style={nav.link}>Upload</a>
+            <a href="/profile" style={nav.link}>Profile</a>
+            <a href="/settings" style={nav.link}>Settings</a>
             <a href="/login" style={nav.link}>Log In</a>
             <a href="/signup" style={nav.signupBtn}>Sign Up</a>
           </div>

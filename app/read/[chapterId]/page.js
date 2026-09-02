@@ -7,6 +7,9 @@ import { supabase } from "../../../lib/supabaseClient";
 export default function ReadPage() {
   const params = useParams();
   const [chapter, setChapter] = useState(null);
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState("");
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     async function load() {
@@ -16,9 +19,36 @@ export default function ReadPage() {
         .eq("id", params.chapterId)
         .single();
       setChapter(data);
+
+      const { data: commentData } = await supabase
+        .from("comments")
+        .select("*")
+        .eq("chapter_id", params.chapterId)
+        .order("created_at", { ascending: false });
+      setComments(commentData || []);
+
+      const { data: userData } = await supabase.auth.getUser();
+      setUser(userData?.user || null);
     }
     load();
   }, [params.chapterId]);
+
+  async function handlePostComment() {
+    if (!newComment.trim()) return;
+    if (!user) {
+      alert("Log in to comment.");
+      return;
+    }
+    const { data, error } = await supabase
+      .from("comments")
+      .insert({ chapter_id: params.chapterId, user_id: user.id, text: newComment })
+      .select()
+      .single();
+    if (!error) {
+      setComments([data, ...comments]);
+      setNewComment("");
+    }
+  }
 
   if (!chapter) return <main style={{ padding: 24 }}>Loading...</main>;
 
@@ -39,6 +69,30 @@ export default function ReadPage() {
           ))}
         </div>
       )}
+
+      <div style={{ marginTop: 32, borderTop: "1px solid #262626", paddingTop: 20 }}>
+        <h3 style={{ marginBottom: 12 }}>Comments</h3>
+        <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+          <input
+            style={commentInput}
+            placeholder="Add a comment..."
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handlePostComment()}
+          />
+          <button onClick={handlePostComment} style={postBtn}>Post</button>
+        </div>
+        {comments.length === 0 && <p style={{ color: "#8a8a99", fontSize: 14 }}>No comments yet. Be the first!</p>}
+        {comments.map((c) => (
+          <div key={c.id} style={commentRow}>
+            <div style={{ fontSize: 14, color: "#e5e5eb" }}>{c.text}</div>
+          </div>
+        ))}
+      </div>
     </main>
   );
 }
+
+const commentInput = { flex: 1, padding: 10, borderRadius: 6, border: "1px solid #262626", background: "#161616", color: "white" };
+const postBtn = { padding: "0 16px", borderRadius: 6, border: "none", background: "#E63946", color: "white", fontWeight: "bold", cursor: "pointer" };
+const commentRow = { padding: "10px 0", borderBottom: "1px solid #1a1a1a" };
