@@ -7,12 +7,20 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body style={{ margin: 0, fontFamily: "'Poppins', system-ui, sans-serif", background: "#0D0D0D", color: "white" }}>
+        <style>{`
+          @media (max-width: 768px) {
+            .desktop-nav-links { display: none !important; }
+            .bottom-nav { display: flex !important; }
+            body { padding-bottom: 64px; }
+          }
+        `}</style>
+
         <nav style={nav.bar}>
           <a href="/" style={nav.logoWrap}>
             <img src="/mascot.png" alt="GhoulVerse" style={nav.mascot} />
             <span style={nav.logo}>GHOUL<span style={{ color: "#E63946" }}>VERSE</span></span>
           </a>
-          <div style={nav.links}>
+          <div className="desktop-nav-links" style={nav.links}>
             <a href="/explore" style={nav.link}>Explore</a>
             <a href="/library" style={nav.link}>Library</a>
             <a href="/upload" style={nav.link}>Upload</a>
@@ -23,9 +31,74 @@ export default function RootLayout({ children }) {
             <a href="/signup" style={nav.signupBtn}>Sign Up</a>
           </div>
         </nav>
+
         {children}
+
+        <div className="bottom-nav" style={bottomNav.bar}>
+          <a href="/" style={bottomNav.item}>
+            <HomeIcon />
+            <span style={bottomNav.label}>Home</span>
+          </a>
+          <a href="/explore" style={bottomNav.item}>
+            <ExploreIcon />
+            <span style={bottomNav.label}>Explore</span>
+          </a>
+          <a href="/library" style={bottomNav.item}>
+            <LibraryIcon />
+            <span style={bottomNav.label}>Library</span>
+          </a>
+          <a href="/studio" style={bottomNav.item}>
+            <StudioIcon />
+            <span style={bottomNav.label}>Studio</span>
+          </a>
+          <a href="/profile" style={bottomNav.item}>
+            <ProfileIcon />
+            <span style={bottomNav.label}>Profile</span>
+          </a>
+        </div>
       </body>
     </html>
+  );
+}
+
+function HomeIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M3 10.5L12 3l9 7.5" />
+      <path d="M5 9.5V21h14V9.5" />
+    </svg>
+  );
+}
+function ExploreIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M15.5 8.5l-2 5-5 2 2-5z" />
+    </svg>
+  );
+}
+function LibraryIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M4 4h6v16H4z" />
+      <path d="M14 4h6v16h-6z" />
+    </svg>
+  );
+}
+function StudioIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M3 17l4-8 4 5 3-4 7 7" />
+      <path d="M3 21h18" />
+    </svg>
+  );
+}
+function ProfileIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" />
+    </svg>
   );
 }
 
@@ -74,5 +147,31 @@ const nav = {
     fontWeight: "bold",
     padding: "8px 16px",
     borderRadius: 6,
+  },
+};
+
+const bottomNav = {
+  bar: {
+    display: "none",
+    position: "fixed",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    background: "#0D0D0D",
+    borderTop: "1px solid #262626",
+    justifyContent: "space-around",
+    padding: "8px 0 10px",
+    zIndex: 50,
+  },
+  item: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 3,
+    color: "#8a8a99",
+    textDecoration: "none",
+  },
+  label: {
+    fontSize: 10,
   },
 };
