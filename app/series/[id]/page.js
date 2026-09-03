@@ -73,23 +73,61 @@ export default function SeriesPage() {
 
   if (!series) return <main style={{ padding: 24 }}>Loading...</main>;
 
+  const isOwner = user && series.creator_id === user.id;
+
   return (
     <main style={{ padding: 24, maxWidth: 700, margin: "0 auto" }}>
-      <h1>{series.title}</h1>
-      <p style={{ color: "#c9c9d6" }}>{series.description}</p>
-      <p style={{ color: "#8a8a99", fontSize: 13, textTransform: "capitalize" }}>{series.type}</p>
+      <div style={{ display: "flex", gap: 20, marginBottom: 16 }}>
+        <div style={coverBox}>
+          {series.cover_url ? (
+            <img
+              src={series.cover_url}
+              alt={series.title}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          ) : (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "#555", fontSize: 12 }}>
+              No cover
+            </div>
+          )}
+        </div>
+        <div style={{ flex: 1 }}>
+          <h1 style={{ margin: "0 0 8px" }}>{series.title}</h1>
+          <p style={{ color: "#8a8a99", fontSize: 13, textTransform: "capitalize", margin: "0 0 8px" }}>
+            {series.type} · {chapters.length} chapter{chapters.length === 1 ? "" : "s"}
+          </p>
+          {series.description && (
+            <p style={{ color: "#c9c9d6", margin: 0, fontSize: 14, lineHeight: 1.5 }}>
+              {series.description}
+            </p>
+          )}
+        </div>
+      </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "12px 0" }}>
         <button onClick={toggleFollow} style={following ? followingBtn : followBtn}>
           {following ? "Following" : "+ Follow"}
         </button>
-        <span style={{ fontSize: 12, color: "#8a8a99" }}>{followerCount} follower{followerCount === 1 ? "" : "s"}</span>
+        <span style={{ fontSize: 12, color: "#8a8a99" }}>
+          {followerCount} follower{followerCount === 1 ? "" : "s"}
+        </span>
+        {isOwner && (
+          <a href="/upload" style={addChapterBtn}>
+            + Add Chapter
+          </a>
+        )}
       </div>
 
       <div style={{ display: "flex", gap: 8, margin: "12px 0" }}>
-        <button onClick={() => addToLibrary("reading")} style={btn}>+ Reading</button>
-        <button onClick={() => addToLibrary("plan_to_read")} style={btnOutline}>+ Plan to Read</button>
-        <button onClick={() => addToLibrary("completed")} style={btnOutline}>+ Completed</button>
+        <button onClick={() => addToLibrary("reading")} style={btn}>
+          + Reading
+        </button>
+        <button onClick={() => addToLibrary("plan_to_read")} style={btnOutline}>
+          + Plan to Read
+        </button>
+        <button onClick={() => addToLibrary("completed")} style={btnOutline}>
+          + Completed
+        </button>
       </div>
       {status && <p style={{ fontSize: 13, color: "#8a8a99" }}>{status}</p>}
 
@@ -97,15 +135,80 @@ export default function SeriesPage() {
       {chapters.length === 0 && <p style={{ color: "#8a8a99" }}>No chapters yet.</p>}
       <div>
         {chapters.map((c) => (
-          <a key={c.id} href={`/read/${c.id}`} style={chapterRow}>Chapter {c.chapter_number}</a>
+          <a key={c.id} href={`/read/${c.id}`} style={chapterRow}>
+            Chapter {c.chapter_number}
+          </a>
         ))}
       </div>
     </main>
   );
 }
 
-const chapterRow = { display: "block", padding: "12px 16px", background: "#161616", borderRadius: 8, color: "white", textDecoration: "none", marginBottom: 8, border: "1px solid #262626" };
-const btn = { padding: "8px 14px", borderRadius: 6, border: "none", background: "#E63946", color: "white", fontSize: 13, fontWeight: "bold", cursor: "pointer" };
-const btnOutline = { padding: "8px 14px", borderRadius: 6, border: "1px solid #262626", background: "none", color: "white", fontSize: 13, cursor: "pointer" };
-const followBtn = { padding: "6px 16px", borderRadius: 20, border: "1px solid #E63946", background: "none", color: "#E63946", fontSize: 13, fontWeight: "bold", cursor: "pointer" };
-const followingBtn = { padding: "6px 16px", borderRadius: 20, border: "1px solid #262626", background: "#161616", color: "white", fontSize: 13, fontWeight: "bold", cursor: "pointer" };
+const coverBox = {
+  width: 130,
+  height: 195,
+  borderRadius: 10,
+  overflow: "hidden",
+  background: "#1f1f1f",
+  flexShrink: 0,
+  border: "1px solid #262626",
+};
+const chapterRow = {
+  display: "block",
+  padding: "12px 16px",
+  background: "#161616",
+  borderRadius: 8,
+  color: "white",
+  textDecoration: "none",
+  marginBottom: 8,
+  border: "1px solid #262626",
+};
+const btn = {
+  padding: "8px 14px",
+  borderRadius: 6,
+  border: "none",
+  background: "#E63946",
+  color: "white",
+  fontSize: 13,
+  fontWeight: "bold",
+  cursor: "pointer",
+};
+const btnOutline = {
+  padding: "8px 14px",
+  borderRadius: 6,
+  border: "1px solid #262626",
+  background: "none",
+  color: "white",
+  fontSize: 13,
+  cursor: "pointer",
+};
+const followBtn = {
+  padding: "6px 16px",
+  borderRadius: 20,
+  border: "1px solid #E63946",
+  background: "none",
+  color: "#E63946",
+  fontSize: 13,
+  fontWeight: "bold",
+  cursor: "pointer",
+};
+const followingBtn = {
+  padding: "6px 16px",
+  borderRadius: 20,
+  border: "1px solid #262626",
+  background: "#161616",
+  color: "white",
+  fontSize: 13,
+  fontWeight: "bold",
+  cursor: "pointer",
+};
+const addChapterBtn = {
+  marginLeft: "auto",
+  padding: "6px 14px",
+  borderRadius: 6,
+  background: "#E63946",
+  color: "white",
+  fontSize: 13,
+  fontWeight: "bold",
+  textDecoration: "none",
+};
