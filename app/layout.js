@@ -1,6 +1,6 @@
 export const metadata = {
   title: "GhoulVerse",
-  description: "Read and publish manga, manhwa, manhua, and novels",
+  description: "Read and publish manga, manhwa, manhua, and novels — Read Beyond Reality",
 };
 
 import IntroGate from "./IntroGate";
@@ -16,20 +16,46 @@ export default function RootLayout({ children }) {
           href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
+        <meta name="theme-color" content="#0D0D0D" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
       </head>
-      <body style={{ margin: 0, fontFamily: "'Poppins', system-ui, sans-serif", background: "#0D0D0D", color: "white" }}>
+      <body
+        style={{
+          margin: 0,
+          fontFamily: "'Poppins', system-ui, -apple-system, sans-serif",
+          background: "#0D0D0D",
+          color: "white",
+          WebkitFontSmoothing: "antialiased",
+        }}
+      >
         <style>{`
+          * { box-sizing: border-box; }
+          a { color: inherit; }
+          button { font-family: inherit; }
+
+          @keyframes progress {
+            0% { width: 15%; }
+            50% { width: 75%; }
+            100% { width: 15%; }
+          }
+
           @media (max-width: 768px) {
             .desktop-nav-links { display: none !important; }
             .bottom-nav { display: flex !important; }
             body { padding-bottom: 64px; }
           }
+
+          /* Hide scrollbar on horizontal rows but keep scroll */
+          .hide-scrollbar::-webkit-scrollbar { display: none; }
+          .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         `}</style>
 
         <nav style={nav.bar}>
           <a href="/" style={nav.logoWrap}>
             <img src="/mascot.png" alt="GhoulVerse" style={nav.mascot} />
-            <span style={nav.logo}>GHOUL<span style={{ color: "#E63946" }}>VERSE</span></span>
+            <span style={nav.logo}>
+              GHOUL<span style={{ color: "#E63946" }}>VERSE</span>
+            </span>
           </a>
           <div className="desktop-nav-links" style={nav.links}>
             <a href="/explore" style={nav.link}>Explore</a>
@@ -124,6 +150,9 @@ const nav = {
     padding: "12px 20px",
     background: "#0D0D0D",
     borderBottom: "1px solid #262626",
+    position: "sticky",
+    top: 0,
+    zIndex: 40,
   },
   logoWrap: {
     display: "flex",
@@ -139,7 +168,7 @@ const nav = {
   },
   logo: {
     color: "white",
-    fontWeight: "bold",
+    fontWeight: 700,
     fontSize: 17,
     letterSpacing: 0.5,
   },
@@ -152,13 +181,14 @@ const nav = {
     color: "#c9c9d6",
     textDecoration: "none",
     fontSize: 14,
+    fontWeight: 500,
   },
   signupBtn: {
     background: "#E63946",
     color: "white",
     textDecoration: "none",
     fontSize: 14,
-    fontWeight: "bold",
+    fontWeight: 700,
     padding: "8px 16px",
     borderRadius: 6,
   },
@@ -187,5 +217,6 @@ const bottomNav = {
   },
   label: {
     fontSize: 10,
+    fontWeight: 500,
   },
 };
