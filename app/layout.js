@@ -4,6 +4,7 @@ export const metadata = {
 };
 
 import IntroGate from "./IntroGate";
+import Footer from "./Footer";
 
 export default function RootLayout({ children }) {
   return (
@@ -36,6 +37,7 @@ export default function RootLayout({ children }) {
 
         <IntroGate>
           {children}
+          <Footer />
 
           <div className="bottom-nav" style={bottomNav.bar}>
             <a href="/" style={bottomNav.item}>
