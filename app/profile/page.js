@@ -59,6 +59,15 @@ export default function Profile() {
 
       <div style={badge}>Ghoul Member</div>
 
+      <div style={badgesRow}>
+        {mySeries.length > 0 && <span style={badgePill}>🎬 Creator</span>}
+        {libraryCount > 0 && <span style={badgePill}>📖 Reader</span>}
+        {totalChapters >= 5 && <span style={badgePill}>🔥 Prolific</span>}
+        {mySeries.length === 0 && libraryCount === 0 && (
+          <span style={{ fontSize: 12, color: "#8a8a99" }}>Read or upload something to earn your first badge!</span>
+        )}
+      </div>
+
       <div style={statsRow}>
         <div style={statBox}>
           <div style={statNum}>0</div>
@@ -118,7 +127,9 @@ export default function Profile() {
 }
 
 const avatar = { width: 56, height: 56, borderRadius: "50%", background: "#E63946", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: "bold" };
-const badge = { display: "inline-block", marginTop: 12, marginBottom: 16, fontSize: 11, fontWeight: "bold", color: "#E63946", border: "1px solid #E63946", borderRadius: 20, padding: "3px 10px" };
+const badge = { display: "inline-block", marginTop: 12, marginBottom: 12, fontSize: 11, fontWeight: "bold", color: "#E63946", border: "1px solid #E63946", borderRadius: 20, padding: "3px 10px" };
+const badgesRow = { display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 };
+const badgePill = { fontSize: 12, background: "#161616", border: "1px solid #262626", borderRadius: 20, padding: "5px 12px" };
 const statsRow = { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 20 };
 const statBox = { background: "#161616", border: "1px solid #262626", borderRadius: 10, padding: 14, textAlign: "center" };
 const statNum = { fontSize: 18, fontWeight: "bold" };

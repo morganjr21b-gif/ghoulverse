@@ -9,14 +9,13 @@ export default function SeriesPage() {
   const [series, setSeries] = useState(null);
   const [chapters, setChapters] = useState([]);
   const [status, setStatus] = useState("");
+  const [user, setUser] = useState(null);
+  const [following, setFollowing] = useState(false);
+  const [followerCount, setFollowerCount] = useState(0);
 
   useEffect(() => {
     async function load() {
-      const { data: seriesData } = await supabase
-        .from("series")
-        .select("*")
-        .eq("id", params.id)
-        .single();
+      const { data: seriesData } = await supabase.from("series").select("*").eq("id", params.id).single();
       setSeries(seriesData);
 
       const { data: chapterData } = await supabase
@@ -25,6 +24,21 @@ export default function SeriesPage() {
         .eq("series_id", params.id)
         .order("chapter_number", { ascending: true });
       setChapters(chapterData || []);
+
+      const { count } = await supabase.from("follows").select("*", { count: "exact", head: true }).eq("series_id", params.id);
+      setFollowerCount(count || 0);
+
+      const { data: userData } = await supabase.auth.getUser();
+      setUser(userData?.user || null);
+      if (userData?.user) {
+        const { data: followRow } = await supabase
+          .from("follows")
+          .select("*")
+          .eq("user_id", userData.user.id)
+          .eq("series_id", params.id)
+          .maybeSingle();
+        setFollowing(!!followRow);
+      }
     }
     load();
   }, [params.id]);
@@ -41,6 +55,22 @@ export default function SeriesPage() {
     setStatus(error ? "Error: " + error.message : `Added to "${newStatus.replace("_", " ")}"!`);
   }
 
+  async function toggleFollow() {
+    if (!user) {
+      setStatus("Log in to follow this series.");
+      return;
+    }
+    if (following) {
+      await supabase.from("follows").delete().eq("user_id", user.id).eq("series_id", params.id);
+      setFollowing(false);
+      setFollowerCount((c) => Math.max(0, c - 1));
+    } else {
+      await supabase.from("follows").insert({ user_id: user.id, series_id: params.id });
+      setFollowing(true);
+      setFollowerCount((c) => c + 1);
+    }
+  }
+
   if (!series) return <main style={{ padding: 24 }}>Loading...</main>;
 
   return (
@@ -49,7 +79,14 @@ export default function SeriesPage() {
       <p style={{ color: "#c9c9d6" }}>{series.description}</p>
       <p style={{ color: "#8a8a99", fontSize: 13, textTransform: "capitalize" }}>{series.type}</p>
 
-      <div style={{ display: "flex", gap: 8, margin: "16px 0" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "12px 0" }}>
+        <button onClick={toggleFollow} style={following ? followingBtn : followBtn}>
+          {following ? "Following" : "+ Follow"}
+        </button>
+        <span style={{ fontSize: 12, color: "#8a8a99" }}>{followerCount} follower{followerCount === 1 ? "" : "s"}</span>
+      </div>
+
+      <div style={{ display: "flex", gap: 8, margin: "12px 0" }}>
         <button onClick={() => addToLibrary("reading")} style={btn}>+ Reading</button>
         <button onClick={() => addToLibrary("plan_to_read")} style={btnOutline}>+ Plan to Read</button>
         <button onClick={() => addToLibrary("completed")} style={btnOutline}>+ Completed</button>
@@ -60,24 +97,15 @@ export default function SeriesPage() {
       {chapters.length === 0 && <p style={{ color: "#8a8a99" }}>No chapters yet.</p>}
       <div>
         {chapters.map((c) => (
-          <a key={c.id} href={`/read/${c.id}`} style={chapterRow}>
-            Chapter {c.chapter_number}
-          </a>
+          <a key={c.id} href={`/read/${c.id}`} style={chapterRow}>Chapter {c.chapter_number}</a>
         ))}
       </div>
     </main>
   );
 }
 
-const chapterRow = {
-  display: "block",
-  padding: "12px 16px",
-  background: "#161616",
-  borderRadius: 8,
-  color: "white",
-  textDecoration: "none",
-  marginBottom: 8,
-  border: "1px solid #262626",
-};
+const chapterRow = { display: "block", padding: "12px 16px", background: "#161616", borderRadius: 8, color: "white", textDecoration: "none", marginBottom: 8, border: "1px solid #262626" };
 const btn = { padding: "8px 14px", borderRadius: 6, border: "none", background: "#E63946", color: "white", fontSize: 13, fontWeight: "bold", cursor: "pointer" };
 const btnOutline = { padding: "8px 14px", borderRadius: 6, border: "1px solid #262626", background: "none", color: "white", fontSize: 13, cursor: "pointer" };
+const followBtn = { padding: "6px 16px", borderRadius: 20, border: "1px solid #E63946", background: "none", color: "#E63946", fontSize: 13, fontWeight: "bold", cursor: "pointer" };
+const followingBtn = { padding: "6px 16px", borderRadius: 20, border: "1px solid #262626", background: "#161616", color: "white", fontSize: 13, fontWeight: "bold", cursor: "pointer" };
