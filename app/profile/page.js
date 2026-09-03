@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
+import { ADMIN_EMAIL } from "../../lib/config";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
   const [mySeries, setMySeries] = useState([]);
   const [libraryCount, setLibraryCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [upgrading, setUpgrading] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -41,29 +43,55 @@ export default function Profile() {
     window.location.href = "/";
   }
 
+  async function handleUpgrade() {
+    setUpgrading(true);
+    const { data, error } = await supabase.auth.updateUser({ data: { is_vip: true } });
+    if (!error && data?.user) setUser(data.user);
+    setUpgrading(false);
+  }
+
   if (loading) return <main style={{ padding: 24 }}>Loading...</main>;
   if (!user) return <main style={{ padding: 24 }}>Please <a href="/login" style={{ color: "#E63946" }}>log in</a> to view your profile.</main>;
 
   const username = user.user_metadata?.username || user.email.split("@")[0];
   const totalChapters = mySeries.reduce((sum, s) => sum + (s.chapters?.length || 0), 0);
+  const isAdmin = user.email === ADMIN_EMAIL;
+  const isVip = isAdmin || user.user_metadata?.is_vip === true;
 
   return (
     <main style={{ padding: 24, maxWidth: 700, margin: "0 auto" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 8 }}>
-        <div style={avatar}>{username[0]?.toUpperCase()}</div>
+        <div style={{ ...avatar, boxShadow: isVip ? "0 0 0 3px #FFD700" : "none" }}>
+          {username[0]?.toUpperCase()}
+        </div>
         <div>
-          <div style={{ fontWeight: "bold", fontSize: 18 }}>{username}</div>
+          <div style={{ fontWeight: "bold", fontSize: 18, display: "flex", alignItems: "center", gap: 6 }}>
+            {username} {isVip && <span title="VIP">👑</span>}
+          </div>
           <div style={{ fontSize: 13, color: "#8a8a99" }}>@{username}</div>
         </div>
       </div>
 
-      <div style={badge}>Ghoul Member</div>
+      {isVip ? (
+        <div style={vipBadge}>👑 {isAdmin ? "Creator (Free VIP)" : "VIP Member"}</div>
+      ) : (
+        <div style={{ marginTop: 12, marginBottom: 16 }}>
+          <div style={badge}>Ghoul Member</div>
+          <button onClick={handleUpgrade} disabled={upgrading} style={upgradeBtn}>
+            {upgrading ? "Upgrading..." : "👑 Become VIP"}
+          </button>
+          <p style={{ fontSize: 11, color: "#8a8a99", marginTop: 6 }}>
+            No payment is collected yet — this just previews VIP status.
+          </p>
+        </div>
+      )}
 
       <div style={badgesRow}>
         {mySeries.length > 0 && <span style={badgePill}>🎬 Creator</span>}
         {libraryCount > 0 && <span style={badgePill}>📖 Reader</span>}
         {totalChapters >= 5 && <span style={badgePill}>🔥 Prolific</span>}
-        {mySeries.length === 0 && libraryCount === 0 && (
+        {isVip && <span style={badgePill}>👑 VIP</span>}
+        {mySeries.length === 0 && libraryCount === 0 && !isVip && (
           <span style={{ fontSize: 12, color: "#8a8a99" }}>Read or upload something to earn your first badge!</span>
         )}
       </div>
@@ -127,7 +155,9 @@ export default function Profile() {
 }
 
 const avatar = { width: 56, height: 56, borderRadius: "50%", background: "#E63946", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: "bold" };
-const badge = { display: "inline-block", marginTop: 12, marginBottom: 12, fontSize: 11, fontWeight: "bold", color: "#E63946", border: "1px solid #E63946", borderRadius: 20, padding: "3px 10px" };
+const badge = { display: "inline-block", marginBottom: 8, fontSize: 11, fontWeight: "bold", color: "#E63946", border: "1px solid #E63946", borderRadius: 20, padding: "3px 10px" };
+const vipBadge = { display: "inline-block", marginTop: 12, marginBottom: 16, fontSize: 12, fontWeight: "bold", color: "#0D0D0D", background: "linear-gradient(135deg, #FFD700, #E6B800)", borderRadius: 20, padding: "5px 14px" };
+const upgradeBtn = { display: "block", marginTop: 8, padding: "8px 16px", borderRadius: 20, border: "none", background: "linear-gradient(135deg, #FFD700, #E6B800)", color: "#0D0D0D", fontWeight: "bold", fontSize: 12, cursor: "pointer" };
 const badgesRow = { display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 };
 const badgePill = { fontSize: 12, background: "#161616", border: "1px solid #262626", borderRadius: 20, padding: "5px 12px" };
 const statsRow = { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 20 };
