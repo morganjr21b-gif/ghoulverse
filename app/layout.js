@@ -3,6 +3,8 @@ export const metadata = {
   description: "Read and publish manga, manhwa, manhua, and novels",
 };
 
+import IntroGate from "./IntroGate";
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
@@ -32,30 +34,32 @@ export default function RootLayout({ children }) {
           </div>
         </nav>
 
-        {children}
+        <IntroGate>
+          {children}
 
-        <div className="bottom-nav" style={bottomNav.bar}>
-          <a href="/" style={bottomNav.item}>
-            <HomeIcon />
-            <span style={bottomNav.label}>Home</span>
-          </a>
-          <a href="/explore" style={bottomNav.item}>
-            <ExploreIcon />
-            <span style={bottomNav.label}>Explore</span>
-          </a>
-          <a href="/library" style={bottomNav.item}>
-            <LibraryIcon />
-            <span style={bottomNav.label}>Library</span>
-          </a>
-          <a href="/studio" style={bottomNav.item}>
-            <StudioIcon />
-            <span style={bottomNav.label}>Studio</span>
-          </a>
-          <a href="/profile" style={bottomNav.item}>
-            <ProfileIcon />
-            <span style={bottomNav.label}>Profile</span>
-          </a>
-        </div>
+          <div className="bottom-nav" style={bottomNav.bar}>
+            <a href="/" style={bottomNav.item}>
+              <HomeIcon />
+              <span style={bottomNav.label}>Home</span>
+            </a>
+            <a href="/explore" style={bottomNav.item}>
+              <ExploreIcon />
+              <span style={bottomNav.label}>Explore</span>
+            </a>
+            <a href="/library" style={bottomNav.item}>
+              <LibraryIcon />
+              <span style={bottomNav.label}>Library</span>
+            </a>
+            <a href="/studio" style={bottomNav.item}>
+              <StudioIcon />
+              <span style={bottomNav.label}>Studio</span>
+            </a>
+            <a href="/profile" style={bottomNav.item}>
+              <ProfileIcon />
+              <span style={bottomNav.label}>Profile</span>
+            </a>
+          </div>
+        </IntroGate>
       </body>
     </html>
   );
